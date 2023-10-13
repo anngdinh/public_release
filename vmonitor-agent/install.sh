@@ -23,7 +23,7 @@ else
     cp --remove-destination $PACKAGE_NAME /tmp/$PACKAGE_NAME
 fi
 printf "\033[34m\n* Installing the vMonitor Agent package\n\033[0m\n"
-
+$sudo_cmd /etc/vmonitor-agent/setup "$V_USER" "$V_PASS" "$V_HOST:$V_PORT"
 $sudo_cmd dpkg -i /tmp/$PACKAGE_NAME
 
 # Set the configuration
