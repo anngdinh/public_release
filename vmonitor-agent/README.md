@@ -46,10 +46,10 @@ performance-schema-consumer-events-statements-history=ON
 sudo systemctl restart mysql.service
 ```
 
-### Add vngcloud schema and procedure explain
+### Add vmonitor schema and procedure explain
 
 ```sql
-create schema vngcloud;
+create schema vmonitor;
 
 DELIMITER $$
 CREATE PROCEDURE <YOUR_SCHEMA>.explain_statement(IN query TEXT)
@@ -163,8 +163,11 @@ apt purge vmonitor-agent -y
 ###############################################################################
 
 [[inputs.prometheus]]
-  ## An array of urls to scrape metrics from.
   urls = ["http://localhost:1111/metrics"]
+
+[[inputs.prometheus]]
+  urls = ["http://localhost:8888/metrics"]
+  namepass = ["otelcol_process_cpu_seconds"]
 ```
 
 ## Note
