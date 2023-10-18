@@ -1,3 +1,8 @@
+#!/bin/sh
+
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 if [[ ! $V_USER || ! $V_PASS || ! $V_HOST || ! $V_PORT ]]; then
   printf "\033[31mV_USER, V_PASS, V_HOST, V_PORT not available in environment.\033[0m\n"
   exit 1;
