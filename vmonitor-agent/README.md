@@ -48,7 +48,7 @@ sudo systemctl restart mysql.service
 
 ### Add vmonitor schema and procedure explain
 
-```sql
+```mysql=
 create schema vmonitor;
 
 DELIMITER $$
@@ -61,6 +61,13 @@ BEGIN
     DEALLOCATE PREPARE stmt;
 END $$
 DELIMITER ;
+```
+
+### Update runtime consume
+
+```mysql!
+UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name LIKE 'events_statements_%';
+UPDATE performance_schema.setup_consumers SET enabled='YES' WHERE name = 'events_waits_current';
 ```
 
 ## Install agent
@@ -108,66 +115,6 @@ journalctl -xeu vmonitor-agent.service
 ```bash
 systemctl stop vmonitor-agent
 apt purge vmonitor-agent -y
-```
-
-## Intall our telegraf to push metric
-
-```bash
-
-```
-
-```yaml
-# Telegraf Configuration
-[global_tags]
-  # dc = "us-east-1" # will tag all metrics with dc=us-east-1
-  # rack = "1a"
-[agent]
-  ## Default data collection interval for all inputs
-  interval = "60s"
-  round_interval = true
-  metric_batch_size = 1000
-  metric_buffer_limit = 15000
-  collection_jitter = "0s"
-  flush_interval = "60s"
-  flush_jitter = "0s"
-  precision = "0s"
-  hostname = ""
-  omit_hostname = false
-
-###############################################################################
-#                            OUTPUT PLUGINS                                   #
-###############################################################################
-
-# Configuration for sending metrics to vMonitor
-[[outputs.vngcloud_vmonitor]]
-  url = "https://${VMONITOR_SITE}:443"
-  insecure_skip_verify = false
-  data_format = "vngcloud_vmonitor"
-  timeout = "30s"
-
-  client_id = "${IAM_CLIENT_ID}"
-  client_secret = "${IAM_CLIENT_SECRET}"
-  iam_url = "${IAM_URL}"
-
-###############################################################################
-#                            AGGREGATOR PLUGINS                               #
-###############################################################################
-
-# # Calculates a derivative for every field.
-[[aggregators.derivative]]
-  period = "60s"
-  namepass = ["annd2*"]
-
-###############################################################################
-#                            INPUT PLUGINS                                    #
-###############################################################################
-
-[[inputs.prometheus]]
-  urls = ["http://localhost:1111/metrics"]
-
-[[inputs.prometheus]]
-  urls = ["http://localhost:8888/metrics"]
-  namepass = ["otelcol_process_cpu_seconds"]
 ```
 
 ## Note
