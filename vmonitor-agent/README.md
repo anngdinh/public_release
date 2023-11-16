@@ -31,17 +31,17 @@ FLUSH PRIVILEGES;
 ### Change config mysql
 
 ```bash
-nano /etc/mysql/my.cnf
+vi /etc/mysql/conf.d/my.cnf
 
 [mysqld]
 performance_schema=ON
-max_digest_length=4096
 performance_schema_max_digest_length=4096
 performance_schema_max_sql_text_length=4096
 performance-schema-consumer-events-statements-current=ON
 performance-schema-consumer-events-waits-current=ON
 performance-schema-consumer-events-statements-history-long=ON
 performance-schema-consumer-events-statements-history=ON
+max_connections=5000
 
 sudo systemctl restart mysql.service
 ```
@@ -115,6 +115,27 @@ journalctl -xeu vmonitor-agent.service
 ```bash
 systemctl stop vmonitor-agent
 apt purge vmonitor-agent -y
+```
+
+## Install telegraf to monitor mysql
+
+```c
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  collection_jitter = "0s"
+  flush_interval = "10s"
+  flush_jitter = "0s"
+  precision = "0s"
+  hostname = ""
+  omit_hostname = false
+
+[[inputs.mysql]]
+  servers = ["annd2:password@tcp(127.0.0.1:3306)/?tls=false"]
+[[outputs.prometheus_client]]
+  listen = ":6767"
 ```
 
 ## Note
